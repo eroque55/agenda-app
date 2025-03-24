@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import NavBar from "@/src/components/NavBar";
 import {
    BackgroundContainer,
@@ -8,66 +9,70 @@ import {
    ActionsContainer,
 } from "./styles";
 import { Title } from "@/src/components/Title";
-import InputComponent from "../components/Input";
-import ButtonComponent from "../components/Button";
-import List from "../components/List";
-import { IconProps } from "../components/Icon";
-import Modal from "../components/Modal";
-import { toast, ToastContainer } from "react-toastify";
+import { StyledInput } from "@/src/components/Input/styles";
+import ButtonComponent from "@/src/components/Button";
+import ListCustomer from "@/src/components/ListCustomer";
+import { useCustomersStore } from "@/src/store/CustomerStore";
+import ModalCustomerCreate from "@/src/components/ModalCustomerCreate";
+import { ToastContainer } from "react-toastify";
+import ICustomer from "../interfaces/ICustomer";
+import { useForm } from "react-hook-form";
 
-const headerContent = ["Nome", "CPF", "Data de nascimento", "Endereço"];
+const Home = () => {
+   const { setCustomers } = useCustomersStore();
+   const [isModalOpen, setIsModalOpen] = useState(false);
 
-const listContent = [
-   ["Fulano", "123.456.789-00", "01/01/2000", "Rua dos Bobos, 0"],
-   ["Ciclano", "987.654.321-00", "02/02/2000", "Rua dos Bobos, 1"],
-   ["Beltrano", "456.789.123-00", "03/03/2000", "Rua dos Bobos, 2"],
-];
+   const dsadas: ICustomer = {
+      id: 1,
+      name: "Teste",
+      cpf: "12312312312",
+      address: "Rua teste",
+      birthday: new Date("2021-10-10"),
+      contacts: [],
+   };
 
-const handleDelete = () => console.log("trash");
-const handleView = () => console.log("eye");
+   useEffect(() => {
+      setCustomers();
+   }, []);
 
-const listButtons: IconProps[] = [
-   { name: "TrashIcon", onClick: handleDelete },
-   { name: "EyeIcon", onClick: handleView },
-];
+   const {
+      register,
+      handleSubmit,
+      formState: { errors },
+   } = useForm<ICustomer>({ mode: "onBlur" });
 
-const testToast = () => {
-   toast(Modal, {
-      data: {
-         title: "Teste",
-         message: "Testando",
-         confirmButton: "OK",
-      },
-      toastId: "modal",
-      position: "top-center",
-      autoClose: false,
-      closeButton: false,
-      hideProgressBar: true,
-   });
-};
+   const handleSearch = async (data: ICustomer) => {
+      await setCustomers(data);
+   };
 
-export default function Home() {
    return (
       <BackgroundContainer>
-         <ToastContainer />
+         <ModalCustomerCreate isOpen={isModalOpen} setIsOpen={setIsModalOpen} />
          <NavBar />
          <MainContainer>
             <HeaderContainer>
                <Title>Lista de clientes</Title>
                <ActionsContainer>
-                  <InputComponent
-                     width="12.5rem"
+                  <StyledInput
+                     $width="13rem"
                      placeholder="Buscar por nome"
+                     {...register("name")}
                   />
-                  <InputComponent
-                     width="12.5rem"
+                  <StyledInput
+                     $width="13rem"
                      placeholder="Buscar por CPF"
+                     {...register("cpf")}
                   />
-                  <ButtonComponent wired width="12.5rem" icon="SearchIcon">
+                  <ButtonComponent
+                     wired
+                     width="12.5rem"
+                     icon="SearchIcon"
+                     onClick={handleSubmit(handleSearch)}
+                  >
                      Pesquisar
                   </ButtonComponent>
                   <ButtonComponent
-                     onClick={testToast}
+                     onClick={() => setIsModalOpen(true)}
                      width="12.5rem"
                      icon="PlusIcon"
                   >
@@ -75,12 +80,11 @@ export default function Home() {
                   </ButtonComponent>
                </ActionsContainer>
             </HeaderContainer>
-            <List
-               headerContent={headerContent}
-               listContent={listContent}
-               actions={listButtons}
-            />
+            <ListCustomer />
          </MainContainer>
+         <ToastContainer />
       </BackgroundContainer>
    );
-}
+};
+
+export default Home;

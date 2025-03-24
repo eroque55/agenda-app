@@ -1,6 +1,7 @@
 import ModalBody from "../ModalBody";
 import ModalFooter from "../ModalFooter";
 import ModalHeader from "../ModalHeader";
+import { errorModal, successModal } from "../Toasts";
 import { ModalContainer } from "./styles";
 import { ToastContentProps } from "react-toastify";
 
@@ -12,6 +13,7 @@ type Props = ToastContentProps<{
    confirmAction?: () => void;
    cancelButton?: string;
    cancelAction?: () => void;
+   succesMessage?: string;
 }>;
 
 const Modal = ({
@@ -23,17 +25,32 @@ const Modal = ({
       cancelButton,
       confirmAction,
       cancelAction,
+      succesMessage,
    },
    closeToast,
 }: Props) => {
+   const handleConfirm = async () => {
+      try {
+         confirmAction && (await confirmAction());
+         succesMessage && successModal(succesMessage);
+      } catch (e: any) {
+         errorModal(e.response.data);
+      }
+      closeToast();
+   };
+
+   const handleCancel = () => {
+      cancelAction && cancelAction();
+      closeToast();
+   };
    return (
-      <ModalContainer>
+      <ModalContainer $height="13rem">
          <ModalHeader>{title}</ModalHeader>
          <ModalBody notice={notice}>{message}</ModalBody>
          <ModalFooter
             cancelButton={cancelButton}
-            confirmAction={confirmAction || closeToast}
-            cancelAction={cancelAction || closeToast}
+            confirmAction={handleConfirm}
+            cancelAction={handleCancel}
          >
             {confirmButton}
          </ModalFooter>

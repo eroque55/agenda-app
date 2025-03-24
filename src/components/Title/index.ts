@@ -29,3 +29,9 @@ export const Title = styled.h1<Props>`
    color: ${({ color }) => fontColors[color || "blue"]};
    font-size: ${({ size }) => size || 2}rem;
 `;
+
+export const TitleContainer = styled.div`
+   display: flex;
+   align-items: center;
+   gap: 0.75rem;
+`;
