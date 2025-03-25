@@ -1,7 +1,5 @@
 "use client";
 
-import ICustomer from "@/src/interfaces/ICustomer";
-import { getCustomer } from "@/src/services/customer.service";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import {
